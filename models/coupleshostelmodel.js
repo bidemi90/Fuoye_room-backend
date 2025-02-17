@@ -19,6 +19,7 @@ let CoupleshostelSchema = mongoose.Schema(
 
     bank_name: { type: String , required: true }, // New field
     bank_account: { type: Number , required: true }, // New field
+    whatsappcontact: { type: Number , required: true }, // New field
 
     rooms: {
       type: Array,
@@ -29,6 +30,7 @@ let CoupleshostelSchema = mongoose.Schema(
           roomsArray.push({
             room_id: i, // Room ID (1, 2, 3, etc.)
             availability: false, // Default to available
+            occupant: null , // Assigns matric_number of the user
             lease_start_date: { type: Date }, // Start date of the lease (if applicable)
             lease_end_date: { type: Date }, // End date of the lease (if applicable)
           });

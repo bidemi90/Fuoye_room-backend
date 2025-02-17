@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 let UserSchema = mongoose.Schema(
   {
     matric_number: { type: String, required: true },
+    username: { type: String, required: true },
+    full_name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     gender: { type: String, required: true },
     contact_info_1: { type: String },

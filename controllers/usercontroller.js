@@ -33,6 +33,9 @@ const signup = async (req, res) => {
     const ifusermatricnumber = await UserModel.findOne({
       matric_number: body.matric_number,
     });
+    const ifusername = await UserModel.findOne({
+      username: body.username,
+    });
     if (ifuseremail) {
       return res.status(400).send({
         message: "Email already in use",
@@ -43,12 +46,19 @@ const signup = async (req, res) => {
         message: "matric-number already in use",
         status: false,
       });
+    } else if (ifusername) {
+      return res.status(400).send({
+        message: "username already in use",
+        status: false,
+      });
     } else {
       // hashing the passoword
       const hashedPassword = await bcryptjs.hash(body.password, 10);
 
       const newuser = await UserModel.create({
         matric_number: body.matric_number,
+        username: body.username,
+        full_name: body.full_name,
         email: body.email,
         gender: body.gender,
         password: hashedPassword,
@@ -545,6 +555,10 @@ const addingprivatemalehostel = async (req, res) => {
       rent: body.rent,
       is_furnished: body.is_furnished,
       rules: body.building_rules,
+      bank_name: body.bank_name, // New field
+      bank_account: body.bank_account, // New field
+      whatsappcontact: body.whatsappcontact, // New field
+      
     });
 
     if (newmaleroom) {
@@ -602,6 +616,10 @@ const addingprivatefemalehostel = async (req, res) => {
       rent: body.rent,
       is_furnished: body.is_furnished,
       rules: body.building_rules,
+      bank_name: body.bank_name, // New field
+      bank_account: body.bank_account, // New field
+      whatsappcontact: body.whatsappcontact, // New field
+
     });
 
     if (newfemaleroom) {
@@ -658,7 +676,7 @@ const gettingprivatefemalehostel = async (req, res) => {
   }
 };
 
-// 
+//
 const addingmixedhostel = async (req, res) => {
   console.log(req.body);
   let body = req.body;
@@ -699,6 +717,10 @@ const addingmixedhostel = async (req, res) => {
       rent: body.rent,
       is_furnished: body.is_furnished,
       rules: body.building_rules,
+      bank_name: body.bank_name, // New field
+      bank_account: body.bank_account, // New field
+      whatsappcontact: body.whatsappcontact, // New field
+
     });
 
     if (mixedroom) {
@@ -729,13 +751,11 @@ const gettingmixedhostel = async (req, res) => {
   } catch (error) {
     console.error("Error fetching mixed hostel requests:", error);
     return res.status(500).json({
-      message:
-        "An error occurred while fetching mixed hostel requests",
+      message: "An error occurred while fetching mixed hostel requests",
       error: error.message,
     });
   }
 };
-
 
 const addingcoupleshostel = async (req, res) => {
   console.log(req.body);
@@ -777,6 +797,10 @@ const addingcoupleshostel = async (req, res) => {
       rent: body.rent,
       is_furnished: body.is_furnished,
       rules: body.building_rules,
+      bank_name: body.bank_name, // New field
+      bank_account: body.bank_account, // New field
+      whatsappcontact: body.whatsappcontact, // New field
+
     });
 
     if (couplesroom) {
@@ -807,36 +831,967 @@ const gettingcoupleshostel = async (req, res) => {
   } catch (error) {
     console.error("Error fetching couples hostel requests:", error);
     return res.status(500).json({
-      message:
-        "An error occurred while fetching couples hostel requests",
+      message: "An error occurred while fetching couples hostel requests",
       error: error.message,
     });
   }
 };
+
+//
+const updateSchoolMaleHostel = async (req, res) => {
+  const { id } = req.params; // Room ID from URL
+  const { roomNumber, bunkerSpace, rent } = req.body; // Data from form
+
+  try {
+    // Find the existing room
+    let existingRoom = await MaleHostelModel.findById(id);
+    if (!existingRoom) {
+      return res.status(404).json({ message: "Room not found", status: false });
+    }
+
+    // Update the bunkerDetails array if bunkerSpace changes
+    let newBunkerDetails = existingRoom.bunkerDetails;
+
+    if (bunkerSpace !== existingRoom.bunkerSpace) {
+      // Recalculate bunker details based on new bunkerSpace
+      newBunkerDetails = [];
+      const bunkerLabels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+
+      for (let i = 0; i < bunkerSpace * 2; i++) {
+        newBunkerDetails.push({
+          id: bunkerLabels[i],
+          occupant: existingRoom.bunkerDetails[i]?.occupant || null, // Keep existing occupants if possible
+        });
+      }
+    }
+
+    // Update the room details
+    existingRoom.roomNumber = roomNumber;
+    existingRoom.bunkerSpace = bunkerSpace;
+    existingRoom.rent = rent;
+    existingRoom.bunkerDetails = newBunkerDetails;
+
+    // Save the updated room
+    await existingRoom.save();
+
+    return res.status(200).json({
+      message: "Room updated successfully",
+      status: true,
+      updatedRoom: existingRoom,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error updating room", status: false });
+  }
+};
+
+const updateSchoolFemaleHostel = async (req, res) => {
+  const { id } = req.params; // Room ID from URL
+  const { roomNumber, bunkerSpace, rent } = req.body; // Data from form
+
+  try {
+    // Find the existing room
+    let existingRoom = await FemaleHostelModel.findById(id);
+    if (!existingRoom) {
+      return res.status(404).json({ message: "Room not found", status: false });
+    }
+
+    // Update the bunkerDetails array if bunkerSpace changes
+    let newBunkerDetails = existingRoom.bunkerDetails;
+
+    if (bunkerSpace !== existingRoom.bunkerSpace) {
+      // Recalculate bunker details based on new bunkerSpace
+      newBunkerDetails = [];
+      const bunkerLabels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+
+      for (let i = 0; i < bunkerSpace * 2; i++) {
+        newBunkerDetails.push({
+          id: bunkerLabels[i],
+          occupant: existingRoom.bunkerDetails[i]?.occupant || null, // Keep existing occupants if possible
+        });
+      }
+    }
+
+    // Update the room details
+    existingRoom.roomNumber = roomNumber;
+    existingRoom.bunkerSpace = bunkerSpace;
+    existingRoom.rent = rent;
+    existingRoom.bunkerDetails = newBunkerDetails;
+
+    // Save the updated room
+    await existingRoom.save();
+
+    return res.status(200).json({
+      message: "Room updated successfully",
+      status: true,
+      updatedRoom: existingRoom,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error updating room", status: false });
+  }
+};
+
+//
+
+const updatePrivateMaleHostel = async (req, res) => {
+  const { id } = req.params; // Hostel ID from URL
+  let body = req.body; // Store request body
+
+  try {
+    // Find existing hostel by ID
+    let existingHostel = await PrivatemaleHostelModel.findById(id);
+    if (!existingHostel) {
+      return res
+        .status(404)
+        .json({ message: "Hostel not found", status: false });
+    }
+
+    // Upload new image if provided
+    let imageUrl = existingHostel.img_array;
+    if (body.img_array) {
+      const uploadedImage = await cloudinary.uploader.upload(body.img_array);
+      imageUrl = uploadedImage.secure_url;
+    }
+
+    // Update the rooms array if room_count changes
+    let newRooms = existingHostel.rooms;
+    if (body.numbers_of_room !== existingHostel.room_count) {
+      newRooms = [];
+      for (let i = 1; i <= body.numbers_of_room; i++) {
+        newRooms.push({
+          room_id: i,
+          availability: existingHostel.rooms[i - 1]?.availability || false, // Keep old availability if possible
+          lease_start_date:
+            existingHostel.rooms[i - 1]?.lease_start_date || null,
+          lease_end_date: existingHostel.rooms[i - 1]?.lease_end_date || null,
+        });
+      }
+    }
+
+    // Update hostel details
+    existingHostel.img_array = imageUrl;
+    existingHostel.building_name = body.building_name;
+    existingHostel.building_address = body.address;
+    existingHostel.room_description = body.room_description;
+    existingHostel.building_amenities = body.building_amenities;
+    existingHostel.room_count = body.numbers_of_room;
+    existingHostel.one_room_capacity = body.room_capacity;
+    existingHostel.rent = body.rent;
+    existingHostel.is_furnished = body.is_furnished;
+    existingHostel.rules = body.building_rules;
+    existingHostel.bank_name = body.bank_name;
+    existingHostel.bank_account = body.bank_account;
+    existingHostel.rooms = newRooms;
+    existingHostel.whatsappcontact= body.whatsappcontact, // New field
+
+
+    // Save updated hostel
+    await existingHostel.save();
+
+    return res.status(200).json({
+      message: "Hostel updated successfully",
+      status: true,
+      updatedHostel: existingHostel,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error updating hostel", status: false });
+  }
+};
+const updatePrivateFemaleHostel = async (req, res) => {
+  const { id } = req.params; // Hostel ID from URL
+  let body = req.body; // Store request body
+
+  try {
+    // Find existing hostel by ID
+    let existingHostel = await PrivatefemaleHostelModel.findById(id);
+    if (!existingHostel) {
+      return res
+        .status(404)
+        .json({ message: "Hostel not found", status: false });
+    }
+
+    // Upload new image if provided
+    let imageUrl = existingHostel.img_array;
+    if (body.img_array) {
+      const uploadedImage = await cloudinary.uploader.upload(body.img_array);
+      imageUrl = uploadedImage.secure_url;
+    }
+
+    // Update the rooms array if room_count changes
+    let newRooms = existingHostel.rooms;
+    if (body.numbers_of_room !== existingHostel.room_count) {
+      newRooms = [];
+      for (let i = 1; i <= body.numbers_of_room; i++) {
+        newRooms.push({
+          room_id: i,
+          availability: existingHostel.rooms[i - 1]?.availability || false, // Keep old availability if possible
+          lease_start_date:
+            existingHostel.rooms[i - 1]?.lease_start_date || null,
+          lease_end_date: existingHostel.rooms[i - 1]?.lease_end_date || null,
+        });
+      }
+    }
+
+    // Update hostel details
+    existingHostel.img_array = imageUrl;
+    existingHostel.building_name = body.building_name;
+    existingHostel.building_address = body.address;
+    existingHostel.room_description = body.room_description;
+    existingHostel.building_amenities = body.building_amenities;
+    existingHostel.room_count = body.numbers_of_room;
+    existingHostel.one_room_capacity = body.room_capacity;
+    existingHostel.rent = body.rent;
+    existingHostel.is_furnished = body.is_furnished;
+    existingHostel.rules = body.building_rules;
+    existingHostel.bank_name = body.bank_name;
+    existingHostel.bank_account = body.bank_account;
+    existingHostel.rooms = newRooms;
+    existingHostel.whatsappcontact= body.whatsappcontact, // New field
+
+
+    // Save updated hostel
+    await existingHostel.save();
+
+    return res.status(200).json({
+      message: "Hostel updated successfully",
+      status: true,
+      updatedHostel: existingHostel,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error updating hostel", status: false });
+  }
+};
+
+//
+const updatemixedhostel = async (req, res) => {
+  const { id } = req.params; // Hostel ID from URL
+  let body = req.body; // Store request body
+
+  try {
+    // Find existing hostel by ID
+    let existingHostel = await MixedhostelModel.findById(id);
+    if (!existingHostel) {
+      return res
+        .status(404)
+        .json({ message: "Hostel not found", status: false });
+    }
+
+    // Upload new image if provided
+    let imageUrl = existingHostel.img_array;
+    if (body.img_array) {
+      const uploadedImage = await cloudinary.uploader.upload(body.img_array);
+      imageUrl = uploadedImage.secure_url;
+    }
+
+    // Update the rooms array if room_count changes
+    let newRooms = existingHostel.rooms;
+    if (body.numbers_of_room !== existingHostel.room_count) {
+      newRooms = [];
+      for (let i = 1; i <= body.numbers_of_room; i++) {
+        newRooms.push({
+          room_id: i,
+          availability: existingHostel.rooms[i - 1]?.availability || false, // Keep old availability if possible
+          lease_start_date:
+            existingHostel.rooms[i - 1]?.lease_start_date || null,
+          lease_end_date: existingHostel.rooms[i - 1]?.lease_end_date || null,
+        });
+      }
+    }
+
+    // Update hostel details
+    existingHostel.img_array = imageUrl;
+    existingHostel.building_name = body.building_name;
+    existingHostel.building_address = body.address;
+    existingHostel.room_description = body.room_description;
+    existingHostel.building_amenities = body.building_amenities;
+    existingHostel.room_count = body.numbers_of_room;
+    existingHostel.one_room_capacity = body.room_capacity;
+    existingHostel.rent = body.rent;
+    existingHostel.is_furnished = body.is_furnished;
+    existingHostel.rules = body.building_rules;
+    existingHostel.bank_name = body.bank_name;
+    existingHostel.bank_account = body.bank_account;
+    existingHostel.rooms = newRooms;
+    existingHostel.whatsappcontact= body.whatsappcontact, // New field
+
+
+    // Save updated hostel
+    await existingHostel.save();
+
+    return res.status(200).json({
+      message: "Hostel updated successfully",
+      status: true,
+      updatedHostel: existingHostel,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error updating hostel", status: false });
+  }
+};
+const updatecoupleshostel = async (req, res) => {
+  const { id } = req.params; // Hostel ID from URL
+  let body = req.body; // Store request body
+
+  try {
+    // Find existing hostel by ID
+    let existingHostel = await CoupleshostelModel.findById(id);
+    if (!existingHostel) {
+      return res
+        .status(404)
+        .json({ message: "Hostel not found", status: false });
+    }
+
+    // Upload new image if provided
+    let imageUrl = existingHostel.img_array;
+    if (body.img_array) {
+      const uploadedImage = await cloudinary.uploader.upload(body.img_array);
+      imageUrl = uploadedImage.secure_url;
+    }
+
+    // Update the rooms array if room_count changes
+    let newRooms = existingHostel.rooms;
+    if (body.numbers_of_room !== existingHostel.room_count) {
+      newRooms = [];
+      for (let i = 1; i <= body.numbers_of_room; i++) {
+        newRooms.push({
+          room_id: i,
+          availability: existingHostel.rooms[i - 1]?.availability || false, // Keep old availability if possible
+          lease_start_date:
+            existingHostel.rooms[i - 1]?.lease_start_date || null,
+          lease_end_date: existingHostel.rooms[i - 1]?.lease_end_date || null,
+        });
+      }
+    }
+
+    // Update hostel details
+    existingHostel.img_array = imageUrl;
+    existingHostel.building_name = body.building_name;
+    existingHostel.building_address = body.address;
+    existingHostel.room_description = body.room_description;
+    existingHostel.building_amenities = body.building_amenities;
+    existingHostel.room_count = body.numbers_of_room;
+    existingHostel.one_room_capacity = body.room_capacity;
+    existingHostel.rent = body.rent;
+    existingHostel.is_furnished = body.is_furnished;
+    existingHostel.rules = body.building_rules;
+    existingHostel.bank_name = body.bank_name;
+    existingHostel.bank_account = body.bank_account;
+    existingHostel.rooms = newRooms;
+    existingHostel.whatsappcontact= body.whatsappcontact, // New field
+
+
+    // Save updated hostel
+    await existingHostel.save();
+
+    return res.status(200).json({
+      message: "Hostel updated successfully",
+      status: true,
+      updatedHostel: existingHostel,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error updating hostel", status: false });
+  }
+};
+
+//
+
+
+const updatemaleBunkerOccupant = async (req, res) => {
+  try {
+    const { occupant, old_occupant, malehostel_id, bunkerdetails_id } =
+      req.body;
+
+    // 1️⃣ Find the hostel by ID
+    const hostel = await MaleHostelModel.findById(malehostel_id);
+    if (!hostel) {
+      return res.status(404).json({ message: "Hostel not found" });
+    }
+
+    // 2️⃣ If there's a new occupant, validate them
+    if (occupant) {
+      const newOccupant = await UserModel.findOne({ matric_number: occupant });
+
+      if (!newOccupant) {
+        return res.status(400).json({ message: "New occupant not found" });
+      }
+
+      if (newOccupant.gender === "female") {
+        return res
+          .status(400)
+          .json({ message: "Cannot assign a female to a male hostel" });
+      }
+
+      if (newOccupant.roomDetails.length > 0) {
+        return res
+          .status(400)
+          .json({ message: "New occupant already has a room" });
+      }
+    }
+
+    // 3️⃣ Find the correct bunker and update occupant
+    let bunkerFound = false;
+    hostel.bunkerDetails.forEach((bunker) => {
+      if (bunker.id === bunkerdetails_id) {
+        if (occupant) {
+          bunker.occupant = occupant; // Assign new occupant
+        } else {
+          bunker.occupant = null; // Make the bunker empty if no new occupant
+        }
+        bunkerFound = true;
+      }
+    });
+
+    if (!bunkerFound) {
+      return res.status(400).json({ message: "Bunker not found" });
+    }
+
+    // 4️⃣ If there's an old occupant, remove their room details
+    if (old_occupant) {
+      await UserModel.updateOne(
+        { matric_number: old_occupant },
+        { $set: { roomDetails: [] } }
+      );
+    }
+
+    // 5️⃣ If there is a new occupant, update their room details
+    if (occupant) {
+      await UserModel.updateOne(
+        { matric_number: occupant },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "male school hostel",
+                roomNumber: hostel.roomNumber,
+                hostel_id: malehostel_id,
+                bunker_id: bunkerdetails_id,
+              },
+            ],
+          },
+        }
+      );
+    }
+
+    // 6️⃣ Mark `bunkerDetails` as modified and save
+    hostel.markModified("bunkerDetails");
+    await hostel.save();
+
+    return res
+      .status(200)
+      .json({ message: "Bunker occupant updated successfully" });
+  } catch (error) {
+    console.error("Error updating bunker:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+const updatefemaleBunkerOccupant = async (req, res) => {
+  try {
+    const { occupant, old_occupant, femalehostel_id, bunkerdetails_id } =
+      req.body;
+
+    // 1️⃣ Find the hostel by ID
+    const hostel = await FemaleHostelModel.findById(femalehostel_id);
+    if (!hostel) {
+      return res.status(404).json({ message: "Hostel not found" });
+    }
+
+    // 2️⃣ If there's a new occupant, validate them
+    if (occupant) {
+      const newOccupant = await UserModel.findOne({ matric_number: occupant });
+
+      if (!newOccupant) {
+        return res.status(400).json({ message: "New occupant not found" });
+      }
+
+      if (newOccupant.gender === "male") {
+        return res
+          .status(400)
+          .json({ message: "Cannot assign a male to a female hostel" });
+      }
+
+      if (newOccupant.roomDetails.length > 0) {
+        return res
+          .status(400)
+          .json({ message: "New occupant already has a room" });
+      }
+    }
+
+    // 3️⃣ Find the correct bunker and update occupant
+    let bunkerFound = false;
+    hostel.bunkerDetails.forEach((bunker) => {
+      if (bunker.id === bunkerdetails_id) {
+        if (occupant) {
+          bunker.occupant = occupant; // Assign new occupant
+        } else {
+          bunker.occupant = null; // Make the bunker empty if no new occupant
+        }
+        bunkerFound = true;
+      }
+    });
+
+    if (!bunkerFound) {
+      return res.status(400).json({ message: "Bunker not found" });
+    }
+
+    // 4️⃣ If there's an old occupant, remove their room details
+    if (old_occupant) {
+      await UserModel.updateOne(
+        { matric_number: old_occupant },
+        { $set: { roomDetails: [] } }
+      );
+    }
+
+    // 5️⃣ If there is a new occupant, update their room details
+    if (occupant) {
+      await UserModel.updateOne(
+        { matric_number: occupant },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "female school hostel",
+                roomNumber: hostel.roomNumber,
+                hostel_id: femalehostel_id,
+                bunker_id: bunkerdetails_id,
+              },
+            ],
+          },
+        }
+      );
+    }
+
+    // 6️⃣ Mark `bunkerDetails` as modified and save
+    hostel.markModified("bunkerDetails");
+    await hostel.save();
+
+    return res
+      .status(200)
+      .json({ message: "Bunker occupant updated successfully" });
+  } catch (error) {
+    console.error("Error updating bunker:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// 
+const updatePrivateMaleHostelOccupant = async (req, res) => {
+  try {
+    const { occupant, old_occupant, privatemalehostel_id, room_id } = req.body;
+
+    // 1️⃣ Find the hostel by ID
+    const hostel = await PrivatemaleHostelModel.findById(privatemalehostel_id);
+    if (!hostel) {
+      return res.status(404).json({ message: "Hostel not found" });
+    }
+
+    // 2️⃣ If there's a new occupant, validate them
+    if (occupant) {
+      const newOccupant = await UserModel.findOne({ matric_number: occupant });
+
+      if (!newOccupant) {
+        return res.status(400).json({ message: "New occupant not found" });
+      }
+
+      if (newOccupant.gender === "female") {
+        return res
+          .status(400)
+          .json({ message: "Cannot assign a female to a male hostel" });
+      }
+
+      if (newOccupant.roomDetails.length > 0) {
+        return res
+          .status(400)
+          .json({ message: "New occupant already has a room" });
+      }
+    }
+
+    // 3️⃣ Find the correct room and update the occupant
+    let roomFound = false;
+    hostel.rooms.forEach((room) => {
+      if (room.room_id === room_id) {
+        if (occupant) {
+          room.occupant = occupant; // Assign new occupant
+          room.availability = true; // Mark room as occupied
+        } else {
+          room.occupant = null; // Make the room empty
+          room.availability =false ; // Mark room as available
+        }
+        roomFound = true;
+      }
+    });
+
+    if (!roomFound) {
+      return res.status(400).json({ message: "Room not found" });
+    }
+
+    // 4️⃣ If there's an old occupant, remove their room details
+    if (old_occupant) {
+      await UserModel.updateOne(
+        { matric_number: old_occupant },
+        { $set: { roomDetails: [] } }
+      );
+    }
+
+    // 5️⃣ If there is a new occupant, update their room details
+    if (occupant) {
+      await UserModel.updateOne(
+        { matric_number: occupant },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "private male hostel",
+                hostel_name: hostel.building_name,
+                roomNumber: room_id,
+                hostel_id: privatemalehostel_id,
+              },
+            ],
+          },
+        }
+      );
+    }
+
+    // 6️⃣ Mark `rooms` as modified and save
+    hostel.markModified("rooms");
+    await hostel.save();
+
+    return res
+      .status(200)
+      .json({ message: "Room occupant updated successfully" });
+  } catch (error) {
+    console.error("Error updating room:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+const updatePrivateFemaleHostelOccupant = async (req, res) => {
+  try {
+    const { occupant, old_occupant, privatefemalehostel_id, room_id } = req.body;
+
+    // 1️⃣ Find the hostel by ID
+    const hostel = await PrivatefemaleHostelModel.findById(privatefemalehostel_id);
+    if (!hostel) {
+      return res.status(404).json({ message: "Hostel not found" });
+    }
+
+    // 2️⃣ If there's a new occupant, validate them
+    if (occupant) {
+      const newOccupant = await UserModel.findOne({ matric_number: occupant });
+
+      if (!newOccupant) {
+        return res.status(400).json({ message: "New occupant not found" });
+      }
+
+      if (newOccupant.gender === "male") {
+        return res
+          .status(400)
+          .json({ message: "Cannot assign a male to a female hostel" });
+      }
+
+      if (newOccupant.roomDetails.length > 0) {
+        return res
+          .status(400)
+          .json({ message: "New occupant already has a room" });
+      }
+    }
+
+    // 3️⃣ Find the correct room and update the occupant
+    let roomFound = false;
+    hostel.rooms.forEach((room) => {
+      if (room.room_id === room_id) {
+        if (occupant) {
+          room.occupant = occupant; // Assign new occupant
+          room.availability = true; // Mark room as occupied
+        } else {
+          room.occupant = null; // Make the room empty
+          room.availability =false ; // Mark room as available
+        }
+        roomFound = true;
+      }
+    });
+
+    if (!roomFound) {
+      return res.status(400).json({ message: "Room not found" });
+    }
+
+    // 4️⃣ If there's an old occupant, remove their room details
+    if (old_occupant) {
+      await UserModel.updateOne(
+        { matric_number: old_occupant },
+        { $set: { roomDetails: [] } }
+      );
+    }
+
+    // 5️⃣ If there is a new occupant, update their room details
+    if (occupant) {
+      await UserModel.updateOne(
+        { matric_number: occupant },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "private female hostel",
+                hostel_name: hostel.building_name,
+                roomNumber: room_id,
+                hostel_id: privatefemalehostel_id,
+              },
+            ],
+          },
+        }
+      );
+    }
+
+    // 6️⃣ Mark `rooms` as modified and save
+    hostel.markModified("rooms");
+    await hostel.save();
+
+    return res
+      .status(200)
+      .json({ message: "Room occupant updated successfully" });
+  } catch (error) {
+    console.error("Error updating room:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+const updatePrivateMixedHostelOccupant = async (req, res) => {
+  try {
+    const { occupant, old_occupant, privatemixedhostel_id, room_id } = req.body;
+
+    // 1️⃣ Find the hostel by ID
+    const hostel = await MixedhostelModel.findById(privatemixedhostel_id);
+    if (!hostel) {
+      return res.status(404).json({ message: "Hostel not found" });
+    }
+
+    // 2️⃣ If there's a new occupant, validate them
+    if (occupant) {
+      const newOccupant = await UserModel.findOne({ matric_number: occupant });
+
+      if (!newOccupant) {
+        return res.status(400).json({ message: "New occupant not found" });
+      }
+
+      // if (newOccupant.gender === "male") {
+      //   return res
+      //     .status(400)
+      //     .json({ message: "Cannot assign a male to a female hostel" });
+      // }
+      // // commenting this allow user of both gender
+
+      if (newOccupant.roomDetails.length > 0) {
+        return res
+          .status(400)
+          .json({ message: "New occupant already has a room" });
+      }
+    }
+
+    // 3️⃣ Find the correct room and update the occupant
+    let roomFound = false;
+    hostel.rooms.forEach((room) => {
+      if (room.room_id === room_id) {
+        if (occupant) {
+          room.occupant = occupant; // Assign new occupant
+          room.availability = true; // Mark room as occupied
+        } else {
+          room.occupant = null; // Make the room empty
+          room.availability =false ; // Mark room as available
+        }
+        roomFound = true;
+      }
+    });
+
+    if (!roomFound) {
+      return res.status(400).json({ message: "Room not found" });
+    }
+
+    // 4️⃣ If there's an old occupant, remove their room details
+    if (old_occupant) {
+      await UserModel.updateOne(
+        { matric_number: old_occupant },
+        { $set: { roomDetails: [] } }
+      );
+    }
+
+    // 5️⃣ If there is a new occupant, update their room details
+    if (occupant) {
+      await UserModel.updateOne(
+        { matric_number: occupant },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "mixed gender hostel",
+                hostel_name: hostel.building_name,
+                roomNumber: room_id,
+                hostel_id: privatemixedhostel_id,
+              },
+            ],
+          },
+        }
+      );
+    }
+
+    // 6️⃣ Mark `rooms` as modified and save
+    hostel.markModified("rooms");
+    await hostel.save();
+
+    return res
+      .status(200)
+      .json({ message: "Room occupant updated successfully" });
+  } catch (error) {
+    console.error("Error updating room:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+const updatePrivateCouplesHostelOccupant = async (req, res) => {
+  try {
+    const { occupant, old_occupant, privatecoupleshostel_id, room_id } = req.body;
+
+    // 1️⃣ Find the hostel by ID
+    const hostel = await CoupleshostelModel.findById(privatecoupleshostel_id);
+    if (!hostel) {
+      return res.status(404).json({ message: "Hostel not found" });
+    }
+
+    // 2️⃣ If there's a new occupant, validate them
+    if (occupant) {
+      const newOccupant = await UserModel.findOne({ matric_number: occupant });
+
+      if (!newOccupant) {
+        return res.status(400).json({ message: "New occupant not found" });
+      }
+
+      // if (newOccupant.gender === "male") {
+      //   return res
+      //     .status(400)
+      //     .json({ message: "Cannot assign a male to a female hostel" });
+      // }
+      // // commenting this allow user of both gender
+
+      if (newOccupant.roomDetails.length > 0) {
+        return res
+          .status(400)
+          .json({ message: "New occupant already has a room" });
+      }
+    }
+
+    // 3️⃣ Find the correct room and update the occupant
+    let roomFound = false;
+    hostel.rooms.forEach((room) => {
+      if (room.room_id === room_id) {
+        if (occupant) {
+          room.occupant = occupant; // Assign new occupant
+          room.availability = true; // Mark room as occupied
+        } else {
+          room.occupant = null; // Make the room empty
+          room.availability =false ; // Mark room as available
+        }
+        roomFound = true;
+      }
+    });
+
+    if (!roomFound) {
+      return res.status(400).json({ message: "Room not found" });
+    }
+
+    // 4️⃣ If there's an old occupant, remove their room details
+    if (old_occupant) {
+      await UserModel.updateOne(
+        { matric_number: old_occupant },
+        { $set: { roomDetails: [] } }
+      );
+    }
+
+    // 5️⃣ If there is a new occupant, update their room details
+    if (occupant) {
+      await UserModel.updateOne(
+        { matric_number: occupant },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "couples hostel",
+                hostel_name: hostel.building_name,
+                roomNumber: room_id,
+                hostel_id: privatecoupleshostel_id,
+              },
+            ],
+          },
+        }
+      );
+    }
+
+    // 6️⃣ Mark `rooms` as modified and save
+    hostel.markModified("rooms");
+    await hostel.save();
+
+    return res
+      .status(200)
+      .json({ message: "Room occupant updated successfully" });
+  } catch (error) {
+    console.error("Error updating room:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 module.exports = {
   signup,
   login,
   getUserByemail,
   verifyuserondashbord,
-
+  //
   adminsignup,
   adminlogin,
   getadminByemail,
   verifyadminondashbord,
-
+  //
   gettingalluserdata,
-
+  //
   addingschoolmalehostel,
   addingschoolfemalehostel,
+  //
   gettingschoolmalehostel,
   gettingschoolfemalehostel,
-
+  //
   addingprivatemalehostel,
   addingprivatefemalehostel,
   addingmixedhostel,
   addingcoupleshostel,
+  //
   gettingprivatemalehostel,
   gettingprivatefemalehostel,
   gettingmixedhostel,
   gettingcoupleshostel,
+  //
+  updateSchoolMaleHostel,
+  updateSchoolFemaleHostel,
+
+  updatePrivateMaleHostel,
+  updatePrivateFemaleHostel,
+  updatemixedhostel,
+  updatecoupleshostel,
+
+  //
+  updatemaleBunkerOccupant,
+  updatefemaleBunkerOccupant,
+  updatePrivateMaleHostelOccupant,
+  updatePrivateFemaleHostelOccupant,
+  updatePrivateMixedHostelOccupant,
+  updatePrivateCouplesHostelOccupant,
 };

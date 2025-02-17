@@ -4,29 +4,49 @@ const {
   signup,
   login,
   getUserByemail,
-
+  verifyuserondashbord,
+// 
   adminsignup,
   adminlogin,
   getadminByemail,
   verifyadminondashbord,
-
+// 
   gettingalluserdata,
-
+// 
   addingschoolmalehostel,
   addingschoolfemalehostel,
+// 
   gettingschoolmalehostel,
   gettingschoolfemalehostel,
-  verifyuserondashbord,
-
- 
+// 
   addingprivatemalehostel,
   addingprivatefemalehostel,
   addingmixedhostel,
   addingcoupleshostel,
+// 
   gettingprivatemalehostel,
   gettingprivatefemalehostel,
   gettingmixedhostel,
   gettingcoupleshostel,
+// 
+  updateSchoolMaleHostel,
+  updateSchoolFemaleHostel,
+
+  updatePrivateMaleHostel,
+  updatePrivateFemaleHostel,
+  updatemixedhostel,
+  updatecoupleshostel,
+
+  // 
+  updatemaleBunkerOccupant,
+  updatefemaleBunkerOccupant,
+
+  // 
+  updatePrivateMaleHostelOccupant,
+  updatePrivateFemaleHostelOccupant,
+  updatePrivateMixedHostelOccupant,
+  updatePrivateCouplesHostelOccupant,
+
 } = require("../controllers/usercontroller");
 
 const userrouters = express.Router();
@@ -52,9 +72,31 @@ userrouters.post("/addingprivatemalehostel", addingprivatemalehostel);
 userrouters.post("/addingprivatefemalehostel", addingprivatefemalehostel);
 userrouters.post("/addingmixedhostel", addingmixedhostel);
 userrouters.post("/addingcoupleshostel", addingcoupleshostel);
+
 userrouters.get("/gettingprivatemalehostel", gettingprivatemalehostel);
 userrouters.get("/gettingprivatefemalehostel", gettingprivatefemalehostel);
 userrouters.get("/gettingmixedhostel", gettingmixedhostel);
 userrouters.get("/gettingcoupleshostel", gettingcoupleshostel);
+
+userrouters.put("/edit-school-male-hostel/:id", updateSchoolMaleHostel);
+userrouters.put("/edit-school-female-hostel/:id", updateSchoolFemaleHostel);
+
+userrouters.put("/edit-private-male-hostel/:id", updatePrivateMaleHostel);
+userrouters.put("/edit-private-female-hostel/:id", updatePrivateFemaleHostel);
+
+userrouters.put("/edit-mixed-hostel/:id", updatemixedhostel);
+userrouters.put("/edit-couples-hostel/:id", updatecoupleshostel);
+
+userrouters.post("/updatemale-bunker-occupant", updatemaleBunkerOccupant);
+userrouters.post("/updatefemale-bunker-occupant", updatefemaleBunkerOccupant);
+
+// 
+userrouters.post("/updatePrivateMaleHostelOccupant", updatePrivateMaleHostelOccupant);
+userrouters.post("/updatePrivateFemaleHostelOccupant", updatePrivateFemaleHostelOccupant);
+userrouters.post("/updatePrivateMixedHostelOccupant", updatePrivateMixedHostelOccupant);
+userrouters.post("/updatePrivateCouplesHostelOccupant", updatePrivateCouplesHostelOccupant);
+
+
+
 
 module.exports = userrouters;
