@@ -37,15 +37,35 @@ const {
   updatemixedhostel,
   updatecoupleshostel,
 
-  // 
+  
+  //
   updatemaleBunkerOccupant,
   updatefemaleBunkerOccupant,
-
-  // 
+  
   updatePrivateMaleHostelOccupant,
   updatePrivateFemaleHostelOccupant,
   updatePrivateMixedHostelOccupant,
   updatePrivateCouplesHostelOccupant,
+  //
+
+  payformaleschoolhostel,
+  verifypaymentformaleschoolhostel,
+
+  payforfemaleschoolhostel,
+  verifypaymentforfemaleschoolhostel,
+  //
+
+  payformaleprivatehostel,
+  verifypaymentformaleprivatehostel,
+
+  payforfemaleprivatehostel,
+  verifypaymentforfemaleprivatehostel,
+  
+  payformixedprivatehostel,
+  verifypaymentformixedprivatehostel,
+
+  payforcouplesprivatehostel,
+  verifypaymentforcouplesprivatehostel,
 
 } = require("../controllers/usercontroller");
 
@@ -96,6 +116,22 @@ userrouters.post("/updatePrivateFemaleHostelOccupant", updatePrivateFemaleHostel
 userrouters.post("/updatePrivateMixedHostelOccupant", updatePrivateMixedHostelOccupant);
 userrouters.post("/updatePrivateCouplesHostelOccupant", updatePrivateCouplesHostelOccupant);
 
+// 
+userrouters.post("/api/payformaleschoolhostel", payformaleschoolhostel);
+userrouters.get("/api/verifyschoolmalepayment/:reference", verifypaymentformaleschoolhostel);
+
+
+userrouters.post("/api/payforfemaleschoolhostel", payforfemaleschoolhostel);
+userrouters.get("/api/verifyschoolfemalepayment/:reference", verifypaymentforfemaleschoolhostel);
+// 
+userrouters.post("/api/payformaleprivatehostel", payformaleprivatehostel);
+userrouters.get("/api/verifyprivatemalepayment/:reference", verifypaymentformaleprivatehostel);
+userrouters.post("/api/payforfemaleprivatehostel", payforfemaleprivatehostel);
+userrouters.get("/api/verifyprivatefemalepayment/:reference", verifypaymentforfemaleprivatehostel);
+userrouters.post("/api/payformixedprivatehostel", payformixedprivatehostel);
+userrouters.get("/api/verifyprivatemixedpayment/:reference", verifypaymentformixedprivatehostel);
+userrouters.post("/api/payforcouplesprivatehostel", payforcouplesprivatehostel);
+userrouters.get("/api/verifyprivatecouplespayment/:reference", verifypaymentforcouplesprivatehostel);
 
 
 

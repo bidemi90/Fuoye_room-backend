@@ -17,8 +17,7 @@ let CoupleshostelSchema = mongoose.Schema(
     is_furnished: { type: Boolean, default: false }, // Whether the room is furnished
     rules: { type: String }, // Specific rules or regulations for the hostel
 
-    bank_name: { type: String , required: true }, // New field
-    bank_account: { type: Number , required: true }, // New field
+    subaccount: { type: String , required: true }, // subaccount
     whatsappcontact: { type: Number , required: true }, // New field
 
     rooms: {

@@ -22,6 +22,12 @@ const { usermailer } = require("../utils/usermailer");
 
 const cloudinary = require("../utils/cloudinary");
 
+require("dotenv").config();
+
+const axios = require("axios"); // Add this import
+
+const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+
 const signup = async (req, res) => {
   console.log(req.body);
   let body = req.body;
@@ -139,7 +145,9 @@ const getUserByemail = async (req, res) => {
 
     // Log the email being searched for
     console.log("email provided:", email);
-
+    if (email == "undefined" || email == "") {
+      return res.status(404).send({ message: "User not found", status: false });
+    }
     // Find user by email
     const ifusermatricnumber = await UserModel.findOne({
       email: email,
@@ -175,6 +183,7 @@ const getUserByemail = async (req, res) => {
 
 const verifyuserondashbord = async (req, res) => {
   console.log(req.header);
+  console.log(1);
   console.log(req.headers.authorization.split(" ")[1]);
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -555,10 +564,8 @@ const addingprivatemalehostel = async (req, res) => {
       rent: body.rent,
       is_furnished: body.is_furnished,
       rules: body.building_rules,
-      bank_name: body.bank_name, // New field
-      bank_account: body.bank_account, // New field
+      subaccount: body.subaccount, // subaccount
       whatsappcontact: body.whatsappcontact, // New field
-      
     });
 
     if (newmaleroom) {
@@ -616,10 +623,8 @@ const addingprivatefemalehostel = async (req, res) => {
       rent: body.rent,
       is_furnished: body.is_furnished,
       rules: body.building_rules,
-      bank_name: body.bank_name, // New field
-      bank_account: body.bank_account, // New field
+      subaccount: body.subaccount, // subaccount
       whatsappcontact: body.whatsappcontact, // New field
-
     });
 
     if (newfemaleroom) {
@@ -717,10 +722,8 @@ const addingmixedhostel = async (req, res) => {
       rent: body.rent,
       is_furnished: body.is_furnished,
       rules: body.building_rules,
-      bank_name: body.bank_name, // New field
-      bank_account: body.bank_account, // New field
+      subaccount: body.subaccount, // subaccount
       whatsappcontact: body.whatsappcontact, // New field
-
     });
 
     if (mixedroom) {
@@ -797,10 +800,8 @@ const addingcoupleshostel = async (req, res) => {
       rent: body.rent,
       is_furnished: body.is_furnished,
       rules: body.building_rules,
-      bank_name: body.bank_name, // New field
-      bank_account: body.bank_account, // New field
+      subaccount: body.subaccount, // subaccount
       whatsappcontact: body.whatsappcontact, // New field
-
     });
 
     if (couplesroom) {
@@ -972,7 +973,6 @@ const updatePrivateMaleHostel = async (req, res) => {
         });
       }
     }
-
     // Update hostel details
     existingHostel.img_array = imageUrl;
     existingHostel.building_name = body.building_name;
@@ -984,14 +984,11 @@ const updatePrivateMaleHostel = async (req, res) => {
     existingHostel.rent = body.rent;
     existingHostel.is_furnished = body.is_furnished;
     existingHostel.rules = body.building_rules;
-    existingHostel.bank_name = body.bank_name;
-    existingHostel.bank_account = body.bank_account;
+    existingHostel.subaccount = body.subaccount;
     existingHostel.rooms = newRooms;
-    existingHostel.whatsappcontact= body.whatsappcontact, // New field
-
-
-    // Save updated hostel
-    await existingHostel.save();
+    (existingHostel.whatsappcontact = body.whatsappcontact), // New field
+      // Save updated hostel
+      await existingHostel.save();
 
     return res.status(200).json({
       message: "Hostel updated successfully",
@@ -1051,14 +1048,11 @@ const updatePrivateFemaleHostel = async (req, res) => {
     existingHostel.rent = body.rent;
     existingHostel.is_furnished = body.is_furnished;
     existingHostel.rules = body.building_rules;
-    existingHostel.bank_name = body.bank_name;
-    existingHostel.bank_account = body.bank_account;
+    existingHostel.subaccount = body.subaccount;
     existingHostel.rooms = newRooms;
-    existingHostel.whatsappcontact= body.whatsappcontact, // New field
-
-
-    // Save updated hostel
-    await existingHostel.save();
+    (existingHostel.whatsappcontact = body.whatsappcontact), // New field
+      // Save updated hostel
+      await existingHostel.save();
 
     return res.status(200).json({
       message: "Hostel updated successfully",
@@ -1120,14 +1114,11 @@ const updatemixedhostel = async (req, res) => {
     existingHostel.rent = body.rent;
     existingHostel.is_furnished = body.is_furnished;
     existingHostel.rules = body.building_rules;
-    existingHostel.bank_name = body.bank_name;
-    existingHostel.bank_account = body.bank_account;
+    existingHostel.subaccount = body.subaccount;
     existingHostel.rooms = newRooms;
-    existingHostel.whatsappcontact= body.whatsappcontact, // New field
-
-
-    // Save updated hostel
-    await existingHostel.save();
+    (existingHostel.whatsappcontact = body.whatsappcontact), // New field
+      // Save updated hostel
+      await existingHostel.save();
 
     return res.status(200).json({
       message: "Hostel updated successfully",
@@ -1187,14 +1178,11 @@ const updatecoupleshostel = async (req, res) => {
     existingHostel.rent = body.rent;
     existingHostel.is_furnished = body.is_furnished;
     existingHostel.rules = body.building_rules;
-    existingHostel.bank_name = body.bank_name;
-    existingHostel.bank_account = body.bank_account;
+    existingHostel.subaccount = body.subaccount;
     existingHostel.rooms = newRooms;
-    existingHostel.whatsappcontact= body.whatsappcontact, // New field
-
-
-    // Save updated hostel
-    await existingHostel.save();
+    (existingHostel.whatsappcontact = body.whatsappcontact), // New field
+      // Save updated hostel
+      await existingHostel.save();
 
     return res.status(200).json({
       message: "Hostel updated successfully",
@@ -1210,7 +1198,6 @@ const updatecoupleshostel = async (req, res) => {
 };
 
 //
-
 
 const updatemaleBunkerOccupant = async (req, res) => {
   try {
@@ -1389,7 +1376,7 @@ const updatefemaleBunkerOccupant = async (req, res) => {
   }
 };
 
-// 
+//
 const updatePrivateMaleHostelOccupant = async (req, res) => {
   try {
     const { occupant, old_occupant, privatemalehostel_id, room_id } = req.body;
@@ -1430,7 +1417,7 @@ const updatePrivateMaleHostelOccupant = async (req, res) => {
           room.availability = true; // Mark room as occupied
         } else {
           room.occupant = null; // Make the room empty
-          room.availability =false ; // Mark room as available
+          room.availability = false; // Mark room as available
         }
         roomFound = true;
       }
@@ -1481,10 +1468,13 @@ const updatePrivateMaleHostelOccupant = async (req, res) => {
 };
 const updatePrivateFemaleHostelOccupant = async (req, res) => {
   try {
-    const { occupant, old_occupant, privatefemalehostel_id, room_id } = req.body;
+    const { occupant, old_occupant, privatefemalehostel_id, room_id } =
+      req.body;
 
     // 1️⃣ Find the hostel by ID
-    const hostel = await PrivatefemaleHostelModel.findById(privatefemalehostel_id);
+    const hostel = await PrivatefemaleHostelModel.findById(
+      privatefemalehostel_id
+    );
     if (!hostel) {
       return res.status(404).json({ message: "Hostel not found" });
     }
@@ -1519,7 +1509,7 @@ const updatePrivateFemaleHostelOccupant = async (req, res) => {
           room.availability = true; // Mark room as occupied
         } else {
           room.occupant = null; // Make the room empty
-          room.availability =false ; // Mark room as available
+          room.availability = false; // Mark room as available
         }
         roomFound = true;
       }
@@ -1609,7 +1599,7 @@ const updatePrivateMixedHostelOccupant = async (req, res) => {
           room.availability = true; // Mark room as occupied
         } else {
           room.occupant = null; // Make the room empty
-          room.availability =false ; // Mark room as available
+          room.availability = false; // Mark room as available
         }
         roomFound = true;
       }
@@ -1660,7 +1650,8 @@ const updatePrivateMixedHostelOccupant = async (req, res) => {
 };
 const updatePrivateCouplesHostelOccupant = async (req, res) => {
   try {
-    const { occupant, old_occupant, privatecoupleshostel_id, room_id } = req.body;
+    const { occupant, old_occupant, privatecoupleshostel_id, room_id } =
+      req.body;
 
     // 1️⃣ Find the hostel by ID
     const hostel = await CoupleshostelModel.findById(privatecoupleshostel_id);
@@ -1699,7 +1690,7 @@ const updatePrivateCouplesHostelOccupant = async (req, res) => {
           room.availability = true; // Mark room as occupied
         } else {
           room.occupant = null; // Make the room empty
-          room.availability =false ; // Mark room as available
+          room.availability = false; // Mark room as available
         }
         roomFound = true;
       }
@@ -1749,6 +1740,740 @@ const updatePrivateCouplesHostelOccupant = async (req, res) => {
   }
 };
 
+//
+const payformaleschoolhostel = async (req, res) => {
+  console.log("Paystack Secret Key:", process.env.PAYSTACK_SECRET_KEY);
+
+  try {
+    const { email, amount, hostel_id, bunker_id, matric_number } = req.body;
+    console.log("Received request:", req.body);
+
+    const paystackResponse = await axios.post(
+      "https://api.paystack.co/transaction/initialize",
+      {
+        email,
+        amount: amount * 100, // Convert Naira to Kobo
+        currency: "NGN",
+        metadata: { hostel_id, bunker_id, matric_number },
+        callback_url:
+          "http://localhost:5173/dashboard/Payment_successfull_formaleschoolhostel", // Redirect after payment
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Paystack Response:", paystackResponse.data);
+    res.json(paystackResponse.data);
+  } catch (error) {
+    console.error(
+      "Payment initiation failed:",
+      error.response?.data || error.message
+    );
+    res.status(500).json({
+      error: "Payment initiation failed",
+      details: error.response?.data || error.message,
+    });
+  }
+};
+
+const verifypaymentformaleschoolhostel = async (req, res) => {
+  try {
+    const { reference } = req.params;
+
+    const paystackResponse = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+
+    if (paystackResponse.data.data.status === "success") {
+      const { hostel_id, bunker_id, matric_number } =
+        paystackResponse.data.data.metadata;
+
+      // 🔥 Update the hostel: Assign user to the bunker
+      const hostel = await MaleHostelModel.findOneAndUpdate(
+        { _id: hostel_id, "bunkerDetails.id": bunker_id },
+        { $set: { "bunkerDetails.$.occupant": matric_number } },
+        { new: true }
+      );
+
+      // 🔥 Update the user's profile with room details
+      const ifusermatricnumber = await UserModel.findOneAndUpdate(
+        { matric_number },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "male school hostel",
+                roomNumber: hostel.roomNumber,
+                hostel_id: hostel_id,
+                bunker_id: bunker_id,
+              },
+            ],
+          },
+        },
+        { new: true }
+      );
+
+      const token = await jsonwebtoken.sign({ matric_number }, "secretkey", {
+        expiresIn: "1d",
+      });
+
+      const user_details = {
+        message: "login successful",
+        status: true,
+        ifusermatricnumber,
+        token,
+      };
+
+      res.json({
+        success: true,
+        message: "Payment verified, room booked",
+        user_details,
+        hostel,
+      });
+    } else {
+      res.status(400).json({ error: "Payment failed" });
+    }
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    res.status(500).json({ error: "Payment verification failed" });
+  }
+};
+const payforfemaleschoolhostel = async (req, res) => {
+  console.log("Paystack Secret Key:", process.env.PAYSTACK_SECRET_KEY);
+
+  try {
+    const { email, amount, hostel_id, bunker_id, matric_number } = req.body;
+    console.log("Received request:", req.body);
+
+    const paystackResponse = await axios.post(
+      "https://api.paystack.co/transaction/initialize",
+      {
+        email,
+        amount: amount * 100, // Convert Naira to Kobo
+        currency: "NGN",
+        metadata: { hostel_id, bunker_id, matric_number },
+        callback_url:
+          "http://localhost:5173/dashboard/Payment_successfull_forfemaleschoolhostel", // Redirect after payment
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Paystack Response:", paystackResponse.data);
+    res.json(paystackResponse.data);
+  } catch (error) {
+    console.error(
+      "Payment initiation failed:",
+      error.response?.data || error.message
+    );
+    res.status(500).json({
+      error: "Payment initiation failed",
+      details: error.response?.data || error.message,
+    });
+  }
+};
+
+const verifypaymentforfemaleschoolhostel = async (req, res) => {
+  try {
+    const { reference } = req.params;
+
+    const paystackResponse = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+
+    if (paystackResponse.data.data.status === "success") {
+      const { hostel_id, bunker_id, matric_number } =
+        paystackResponse.data.data.metadata;
+
+      // 🔥 Update the hostel: Assign user to the bunker
+      const hostel = await FemaleHostelModel.findOneAndUpdate(
+        { _id: hostel_id, "bunkerDetails.id": bunker_id },
+        { $set: { "bunkerDetails.$.occupant": matric_number } },
+        { new: true }
+      );
+
+      // 🔥 Update the user's profile with room details
+      const ifusermatricnumber = await UserModel.findOneAndUpdate(
+        { matric_number },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "female school hostel",
+                roomNumber: hostel.roomNumber,
+                hostel_id: hostel_id,
+                bunker_id: bunker_id,
+              },
+            ],
+          },
+        },
+        { new: true }
+      );
+
+      const token = await jsonwebtoken.sign({ matric_number }, "secretkey", {
+        expiresIn: "1d",
+      });
+
+      const user_details = {
+        message: "login successful",
+        status: true,
+        ifusermatricnumber,
+        token,
+      };
+
+      res.json({
+        success: true,
+        message: "Payment verified, room booked",
+        user_details,
+        hostel,
+      });
+    } else {
+      res.status(400).json({ error: "Payment failed" });
+    }
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    res.status(500).json({ error: "Payment verification failed" });
+  }
+};
+
+//
+const payformaleprivatehostel = async (req, res) => {
+  console.log("Paystack Secret Key:", process.env.PAYSTACK_SECRET_KEY);
+
+  try {
+    const {
+      email,
+      amount,
+      privatemalehostel_id,
+      room_id,
+      matric_number,
+      subaccount,
+    } = req.body;
+    console.log("Received request:", req.body);
+    console.log(email);
+    console.log(amount);
+    console.log(privatemalehostel_id);
+    console.log(room_id);
+    console.log(matric_number);
+
+    const paystackResponse = await axios.post(
+      "https://api.paystack.co/transaction/initialize",
+      {
+        email,
+        amount: amount * 100, // Convert Naira to Kobo
+        currency: "NGN",
+        metadata: { privatemalehostel_id, room_id, matric_number },
+        callback_url:
+          "http://localhost:5173/dashboard/Payment_successfullforprivatemalehostel",
+        subaccount, // Attach the subaccount to split the payment
+        bearer: "subaccount", // The subaccount bears the transaction charges
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Paystack Response:", paystackResponse.data);
+    res.json(paystackResponse.data);
+  } catch (error) {
+    console.error(
+      "Payment initiation failed:",
+      error.response?.data || error.message
+    );
+    res.status(500).json({
+      error: "Payment initiation failed",
+      details: error.response?.data || error.message,
+    });
+  }
+};
+
+const verifypaymentformaleprivatehostel = async (req, res) => {
+  try {
+    const { reference } = req.params;
+
+    const paystackResponse = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+
+    if (paystackResponse.data.data.status === "success") {
+      const { privatemalehostel_id, room_id, matric_number } =
+        paystackResponse.data.data.metadata;
+      console.log("testing details");
+      console.log(privatemalehostel_id);
+      console.log(room_id);
+      console.log(matric_number);
+
+      // 🔥 Update the hostel: Assign user to the room
+      const hostel = await PrivatemaleHostelModel.findOneAndUpdate(
+        { _id: privatemalehostel_id, "rooms.room_id": Number(room_id) }, // Use "rooms.room_id" instead of "rooms.id"
+        {
+          $set: {
+            "rooms.$.occupant": matric_number,
+            "rooms.$.availability": true,
+          },
+        },
+        { new: true }
+      );
+
+      // 🔥 Update the user's profile with room details
+      const ifusermatricnumber = await UserModel.findOneAndUpdate(
+        { matric_number },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "private male hostel",
+                hostel_name: hostel.building_name,
+                roomNumber: room_id,
+                hostel_id: privatemalehostel_id,
+              },
+            ],
+          },
+        },
+        { new: true }
+      );
+
+      const token = await jsonwebtoken.sign({ matric_number }, "secretkey", {
+        expiresIn: "1d",
+      });
+
+      const user_details = {
+        message: "login successful",
+        status: true,
+        ifusermatricnumber,
+        token,
+      };
+
+      res.json({
+        success: true,
+        message: "Payment verified, room booked",
+        user_details,
+        hostel,
+      });
+    } else {
+      res.status(400).json({ error: "Payment failed" });
+    }
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    res.status(500).json({ error: "Payment verification failed" });
+  }
+};
+
+const payforfemaleprivatehostel = async (req, res) => {
+  console.log("Paystack Secret Key:", process.env.PAYSTACK_SECRET_KEY);
+
+  try {
+    const {
+      email,
+      amount,
+      privatefemalehostel_id,
+      room_id,
+      matric_number,
+      subaccount,
+    } = req.body;
+    console.log("Received request:", req.body);
+    console.log(email);
+    console.log(amount);
+    console.log(privatefemalehostel_id);
+    console.log(room_id);
+    console.log(matric_number);
+
+    const paystackResponse = await axios.post(
+      "https://api.paystack.co/transaction/initialize",
+      {
+        email,
+        amount: amount * 100, // Convert Naira to Kobo
+        currency: "NGN",
+        metadata: { privatefemalehostel_id, room_id, matric_number },
+        callback_url:
+          "http://localhost:5173/dashboard/Payment_successfullforprivatefemalehostel",
+        subaccount, // Attach the subaccount to split the payment
+        bearer: "subaccount", // The subaccount bears the transaction charges
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Paystack Response:", paystackResponse.data);
+    res.json(paystackResponse.data);
+  } catch (error) {
+    console.error(
+      "Payment initiation failed:",
+      error.response?.data || error.message
+    );
+    res.status(500).json({
+      error: "Payment initiation failed",
+      details: error.response?.data || error.message,
+    });
+  }
+};
+
+const verifypaymentforfemaleprivatehostel = async (req, res) => {
+  try {
+    const { reference } = req.params;
+
+    const paystackResponse = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+
+    if (paystackResponse.data.data.status === "success") {
+      const { privatefemalehostel_id, room_id, matric_number } =
+        paystackResponse.data.data.metadata;
+      console.log("testing details");
+      console.log(privatefemalehostel_id);
+      console.log(room_id);
+      console.log(matric_number);
+
+      // 🔥 Update the hostel: Assign user to the room
+      const hostel = await PrivatefemaleHostelModel.findOneAndUpdate(
+        { _id: privatefemalehostel_id, "rooms.room_id": Number(room_id) }, // Use "rooms.room_id" instead of "rooms.id"
+        {
+          $set: {
+            "rooms.$.occupant": matric_number,
+            "rooms.$.availability": true,
+          },
+        },
+        { new: true }
+      );
+
+      // 🔥 Update the user's profile with room details
+      const ifusermatricnumber = await UserModel.findOneAndUpdate(
+        { matric_number },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "private female hostel",
+                hostel_name: hostel.building_name,
+                roomNumber: room_id,
+                hostel_id: privatefemalehostel_id,
+              },
+            ],
+          },
+        },
+        { new: true }
+      );
+
+      const token = await jsonwebtoken.sign({ matric_number }, "secretkey", {
+        expiresIn: "1d",
+      });
+
+      const user_details = {
+        message: "login successful",
+        status: true,
+        ifusermatricnumber,
+        token,
+      };
+
+      res.json({
+        success: true,
+        message: "Payment verified, room booked",
+        user_details,
+        hostel,
+      });
+    } else {
+      res.status(400).json({ error: "Payment failed" });
+    }
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    res.status(500).json({ error: "Payment verification failed" });
+  }
+};
+
+const payformixedprivatehostel = async (req, res) => {
+  console.log("Paystack Secret Key:", process.env.PAYSTACK_SECRET_KEY);
+
+  try {
+    const {
+      email,
+      amount,
+      privatemixedhostel_id,
+      room_id,
+      matric_number,
+      subaccount,
+    } = req.body;
+    console.log("Received request:", req.body);
+    console.log(email);
+    console.log(amount);
+    console.log(privatemixedhostel_id);
+    console.log(room_id);
+    console.log(matric_number);
+
+    const paystackResponse = await axios.post(
+      "https://api.paystack.co/transaction/initialize",
+      {
+        email,
+        amount: amount * 100, // Convert Naira to Kobo
+        currency: "NGN",
+        metadata: { privatemixedhostel_id, room_id, matric_number },
+        callback_url:
+          "http://localhost:5173/dashboard/Payment_successfullforprivatemixedhostel",
+        subaccount, // Attach the subaccount to split the payment
+        bearer: "subaccount", // The subaccount bears the transaction charges
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Paystack Response:", paystackResponse.data);
+    res.json(paystackResponse.data);
+  } catch (error) {
+    console.error(
+      "Payment initiation failed:",
+      error.response?.data || error.message
+    );
+    res.status(500).json({
+      error: "Payment initiation failed",
+      details: error.response?.data || error.message,
+    });
+  }
+};
+
+const verifypaymentformixedprivatehostel = async (req, res) => {
+  try {
+    const { reference } = req.params;
+
+    const paystackResponse = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+
+    if (paystackResponse.data.data.status === "success") {
+      const { privatemixedhostel_id, room_id, matric_number } =
+        paystackResponse.data.data.metadata;
+      console.log("testing details");
+      console.log(privatemixedhostel_id);
+      console.log(room_id);
+      console.log(matric_number);
+
+      // 🔥 Update the hostel: Assign user to the room
+      const hostel = await MixedhostelModel.findOneAndUpdate(
+        { _id: privatemixedhostel_id, "rooms.room_id": Number(room_id) }, // Use "rooms.room_id" instead of "rooms.id"
+        {
+          $set: {
+            "rooms.$.occupant": matric_number,
+            "rooms.$.availability": true,
+          },
+        },
+        { new: true }
+      );
+
+      // 🔥 Update the user's profile with room details
+      const ifusermatricnumber = await UserModel.findOneAndUpdate(
+        { matric_number },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "private mixed hostel",
+                hostel_name: hostel.building_name,
+                roomNumber: room_id,
+                hostel_id: privatemixedhostel_id,
+              },
+            ],
+          },
+        },
+        { new: true }
+      );
+
+      const token = await jsonwebtoken.sign({ matric_number }, "secretkey", {
+        expiresIn: "1d",
+      });
+
+      const user_details = {
+        message: "login successful",
+        status: true,
+        ifusermatricnumber,
+        token,
+      };
+
+      res.json({
+        success: true,
+        message: "Payment verified, room booked",
+        user_details,
+        hostel,
+      });
+    } else {
+      res.status(400).json({ error: "Payment failed" });
+    }
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    res.status(500).json({ error: "Payment verification failed" });
+  }
+};
+
+const payforcouplesprivatehostel = async (req, res) => {
+  console.log("Paystack Secret Key:", process.env.PAYSTACK_SECRET_KEY);
+
+  try {
+    const {
+      email,
+      amount,
+      privatecoupleshostel_id,
+      room_id,
+      matric_number,
+      subaccount,
+    } = req.body;
+    console.log("Received request:", req.body);
+    console.log(email);
+    console.log(amount);
+    console.log(privatecoupleshostel_id);
+    console.log(room_id);
+    console.log(matric_number);
+
+    const paystackResponse = await axios.post(
+      "https://api.paystack.co/transaction/initialize",
+      {
+        email,
+        amount: amount * 100, // Convert Naira to Kobo
+        currency: "NGN",
+        metadata: { privatecoupleshostel_id, room_id, matric_number },
+        callback_url:
+          "http://localhost:5173/dashboard/Payment_successfullforprivatcoupleshostel",
+        subaccount, // Attach the subaccount to split the payment
+        bearer: "subaccount", // The subaccount bears the transaction charges
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Paystack Response:", paystackResponse.data);
+    res.json(paystackResponse.data);
+  } catch (error) {
+    console.error(
+      "Payment initiation failed:",
+      error.response?.data || error.message
+    );
+    res.status(500).json({
+      error: "Payment initiation failed",
+      details: error.response?.data || error.message,
+    });
+  }
+};
+
+const verifypaymentforcouplesprivatehostel = async (req, res) => {
+  try {
+    const { reference } = req.params;
+
+    const paystackResponse = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+
+    if (paystackResponse.data.data.status === "success") {
+      const { privatecoupleshostel_id, room_id, matric_number } =
+        paystackResponse.data.data.metadata;
+      console.log("testing details");
+      console.log(privatecoupleshostel_id);
+      console.log(room_id);
+      console.log(matric_number);
+
+      // 🔥 Update the hostel: Assign user to the room
+      const hostel = await CoupleshostelModel.findOneAndUpdate(
+        { _id: privatecoupleshostel_id, "rooms.room_id": Number(room_id) }, // Use "rooms.room_id" instead of "rooms.id"
+        {
+          $set: {
+            "rooms.$.occupant": matric_number,
+            "rooms.$.availability": true,
+          },
+        },
+        { new: true }
+      );
+
+      // 🔥 Update the user's profile with room details
+      const ifusermatricnumber = await UserModel.findOneAndUpdate(
+        { matric_number },
+        {
+          $set: {
+            roomDetails: [
+              {
+                hostel_type: "private couples hostel",
+                hostel_name: hostel.building_name,
+                roomNumber: room_id,
+                hostel_id: privatecoupleshostel_id,
+              },
+            ],
+          },
+        },
+        { new: true }
+      );
+
+      const token = await jsonwebtoken.sign({ matric_number }, "secretkey", {
+        expiresIn: "1d",
+      });
+
+      const user_details = {
+        message: "login successful",
+        status: true,
+        ifusermatricnumber,
+        token,
+      };
+
+      res.json({
+        success: true,
+        message: "Payment verified, room booked",
+        user_details,
+        hostel,
+      });
+    } else {
+      res.status(400).json({ error: "Payment failed" });
+    }
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    res.status(500).json({ error: "Payment verification failed" });
+  }
+};
 
 module.exports = {
   signup,
@@ -1790,8 +2515,29 @@ module.exports = {
   //
   updatemaleBunkerOccupant,
   updatefemaleBunkerOccupant,
+
   updatePrivateMaleHostelOccupant,
   updatePrivateFemaleHostelOccupant,
   updatePrivateMixedHostelOccupant,
   updatePrivateCouplesHostelOccupant,
+  //
+
+  payformaleschoolhostel,
+  verifypaymentformaleschoolhostel,
+
+  payforfemaleschoolhostel,
+  verifypaymentforfemaleschoolhostel,
+  //
+
+  payformaleprivatehostel,
+  verifypaymentformaleprivatehostel,
+
+  payforfemaleprivatehostel,
+  verifypaymentforfemaleprivatehostel,
+
+  payformixedprivatehostel,
+  verifypaymentformixedprivatehostel,
+
+  payforcouplesprivatehostel,
+  verifypaymentforcouplesprivatehostel,
 };
