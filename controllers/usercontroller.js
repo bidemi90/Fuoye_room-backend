@@ -1756,7 +1756,7 @@ const payformaleschoolhostel = async (req, res) => {
         currency: "NGN",
         metadata: { hostel_id, bunker_id, matric_number },
         callback_url:
-          "http://localhost:5173/dashboard/Payment_successfull_formaleschoolhostel", // Redirect after payment
+          "https://fuoye-room-frontend.vercel.app/dashboard/Payment_successfull_formaleschoolhostel", // Redirect after payment
       },
       {
         headers: {
@@ -1875,7 +1875,7 @@ const payforfemaleschoolhostel = async (req, res) => {
         currency: "NGN",
         metadata: { hostel_id, bunker_id, matric_number },
         callback_url:
-          "http://localhost:5173/dashboard/Payment_successfull_forfemaleschoolhostel", // Redirect after payment
+          "https://fuoye-room-frontend.vercel.app/dashboard/Payment_successfull_forfemaleschoolhostel", // Redirect after payment
       },
       {
         headers: {
@@ -2007,7 +2007,7 @@ const payformaleprivatehostel = async (req, res) => {
         currency: "NGN",
         metadata: { privatemalehostel_id, room_id, matric_number },
         callback_url:
-          "http://localhost:5173/dashboard/Payment_successfullforprivatemalehostel",
+          "https://fuoye-room-frontend.vercel.app/dashboard/Payment_successfullforprivatemalehostel",
         subaccount, // Attach the subaccount to split the payment
         bearer: "subaccount", // The subaccount bears the transaction charges
       },
@@ -2149,7 +2149,7 @@ const payforfemaleprivatehostel = async (req, res) => {
         currency: "NGN",
         metadata: { privatefemalehostel_id, room_id, matric_number },
         callback_url:
-          "http://localhost:5173/dashboard/Payment_successfullforprivatefemalehostel",
+          "https://fuoye-room-frontend.vercel.app/dashboard/Payment_successfullforprivatefemalehostel",
         subaccount, // Attach the subaccount to split the payment
         bearer: "subaccount", // The subaccount bears the transaction charges
       },
@@ -2291,7 +2291,7 @@ const payformixedprivatehostel = async (req, res) => {
         currency: "NGN",
         metadata: { privatemixedhostel_id, room_id, matric_number },
         callback_url:
-          "http://localhost:5173/dashboard/Payment_successfullforprivatemixedhostel",
+          "https://fuoye-room-frontend.vercel.app/dashboard/Payment_successfullforprivatemixedhostel",
         subaccount, // Attach the subaccount to split the payment
         bearer: "subaccount", // The subaccount bears the transaction charges
       },
@@ -2433,7 +2433,7 @@ const payforcouplesprivatehostel = async (req, res) => {
         currency: "NGN",
         metadata: { privatecoupleshostel_id, room_id, matric_number },
         callback_url:
-          "http://localhost:5173/dashboard/Payment_successfullforprivatcoupleshostel",
+          "https://fuoye-room-frontend.vercel.app/dashboard/Payment_successfullforprivatcoupleshostel",
         subaccount, // Attach the subaccount to split the payment
         bearer: "subaccount", // The subaccount bears the transaction charges
       },
