@@ -1625,7 +1625,7 @@ const updatePrivateMixedHostelOccupant = async (req, res) => {
           $set: {
             roomDetails: [
               {
-                hostel_type: "mixed gender hostel",
+                hostel_type: "private mixed hostel",
                 hostel_name: hostel.building_name,
                 roomNumber: room_id,
                 hostel_id: privatemixedhostel_id,
@@ -1716,7 +1716,7 @@ const updatePrivateCouplesHostelOccupant = async (req, res) => {
           $set: {
             roomDetails: [
               {
-                hostel_type: "couples hostel",
+                hostel_type: "private couples hostel",
                 hostel_name: hostel.building_name,
                 roomNumber: room_id,
                 hostel_id: privatecoupleshostel_id,
@@ -1804,7 +1804,7 @@ const verifypaymentformaleschoolhostel = async (req, res) => {
         { new: true }
       );
 
-      // 🔥 Update the user's profile with room details
+      // 🔥 Update the user's profile with room details and payment history
       const ifusermatricnumber = await UserModel.findOneAndUpdate(
         { matric_number },
         {
@@ -1817,6 +1817,18 @@ const verifypaymentformaleschoolhostel = async (req, res) => {
                 bunker_id: bunker_id,
               },
             ],
+          },
+          $push: {
+            payment_history: {
+              reference: reference,
+              amount: paystackResponse.data.data.amount / 100, // Convert from kobo to Naira
+              hostel_type: "male school hostel",
+              hostel_id: hostel_id,
+              // // Assuming hostel has a 'hostelName' field
+              room_number: hostel.roomNumber,
+              bunker_id: bunker_id,
+              payment_time: new Date(), // Store the current time
+            },
           },
         },
         { new: true }
@@ -1847,6 +1859,7 @@ const verifypaymentformaleschoolhostel = async (req, res) => {
     res.status(500).json({ error: "Payment verification failed" });
   }
 };
+
 const payforfemaleschoolhostel = async (req, res) => {
   console.log("Paystack Secret Key:", process.env.PAYSTACK_SECRET_KEY);
 
@@ -1923,6 +1936,18 @@ const verifypaymentforfemaleschoolhostel = async (req, res) => {
                 bunker_id: bunker_id,
               },
             ],
+          },
+          $push: {
+            payment_history: {
+              reference: reference,
+              amount: paystackResponse.data.data.amount / 100, // Convert from kobo to Naira
+              hostel_type: "female school hostel",
+              hostel_id: hostel_id,
+              // // Assuming hostel has a 'hostelName' field
+              room_number: hostel.roomNumber,
+              bunker_id: bunker_id,
+              payment_time: new Date(), // Store the current time
+            },
           },
         },
         { new: true }
@@ -2055,6 +2080,18 @@ const verifypaymentformaleprivatehostel = async (req, res) => {
               },
             ],
           },
+          $push: {
+            payment_history: {
+              reference: reference,
+              amount: paystackResponse.data.data.amount / 100, // Convert from kobo to Naira
+              hostel_type: " private male hostel",
+              hostel_id: privatemalehostel_id,
+              // // Assuming hostel has a 'hostelName' field
+              hostel_name: hostel.building_name,
+              roomNumber: room_id,
+              payment_time: new Date(), // Store the current time
+            },
+          },
         },
         { new: true }
       );
@@ -2184,6 +2221,18 @@ const verifypaymentforfemaleprivatehostel = async (req, res) => {
                 hostel_id: privatefemalehostel_id,
               },
             ],
+          },
+          $push: {
+            payment_history: {
+              reference: reference,
+              amount: paystackResponse.data.data.amount / 100, // Convert from kobo to Naira
+              hostel_type: " private female hostel",
+              hostel_id: privatefemalehostel_id,
+              // // Assuming hostel has a 'hostelName' field
+              hostel_name: hostel.building_name,
+              roomNumber: room_id,
+              payment_time: new Date(), // Store the current time
+            },
           },
         },
         { new: true }
@@ -2315,6 +2364,18 @@ const verifypaymentformixedprivatehostel = async (req, res) => {
               },
             ],
           },
+          $push: {
+            payment_history: {
+              reference: reference,
+              amount: paystackResponse.data.data.amount / 100, // Convert from kobo to Naira
+              hostel_type: " private mixed hostel",
+              hostel_id: privatemixedhostel_id,
+              // // Assuming hostel has a 'hostelName' field
+              hostel_name: hostel.building_name,
+              roomNumber: room_id,
+              payment_time: new Date(), // Store the current time
+            },
+          },
         },
         { new: true }
       );
@@ -2445,6 +2506,18 @@ const verifypaymentforcouplesprivatehostel = async (req, res) => {
               },
             ],
           },
+          $push: {
+            payment_history: {
+              reference: reference,
+              amount: paystackResponse.data.data.amount / 100, // Convert from kobo to Naira
+              hostel_type: " private couples hostel",
+              hostel_id: privatecoupleshostel_id,
+              // // Assuming hostel has a 'hostelName' field
+              hostel_name: hostel.building_name,
+              roomNumber: room_id,
+              payment_time: new Date(), // Store the current time
+            },
+          },
         },
         { new: true }
       );
@@ -2472,6 +2545,46 @@ const verifypaymentforcouplesprivatehostel = async (req, res) => {
   } catch (error) {
     console.error("Payment verification error:", error);
     res.status(500).json({ error: "Payment verification failed" });
+  }
+};
+
+// upload profile image for user
+
+const uploadProfileImage = async (req, res) => {
+  try {
+    const { matric_number, img_array } = req.body;
+    console.log(req.body);
+    console.log(matric_number);
+    console.log(img_array);
+
+    if (!matric_number || !img_array) {
+      return res
+        .status(400)
+        .json({ message: "Matric number and image data are required" });
+    }
+
+    // Find the user by matric number
+    const user = await UserModel.findOne({ matric_number });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Upload image to Cloudinary
+    const image = await cloudinary.uploader.upload(img_array);
+    console.log(image);
+
+    // Update user profile image
+    user.profileImage = image.secure_url;
+    await user.save();
+
+    res.json({
+      message: "Profile image updated successfully",
+      profileImage: image.secure_url,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -2540,4 +2653,7 @@ module.exports = {
 
   payforcouplesprivatehostel,
   verifypaymentforcouplesprivatehostel,
+
+  // upload user profile
+  uploadProfileImage,
 };

@@ -11,7 +11,7 @@ let UserSchema = mongoose.Schema(
     contact_info_1: { type: String },
     contact_info_2: { type: String },
     password: { type: String, required: true }, // Hashed password
-    profileImage: { type: String , default: ""}, // URL to the user's profile image
+    profileImage: { type: String, default: "" }, // URL to the user's profile image
     currentRoomType: {
       type: String,
       enum: ["school_hostel", "private_hostel"],
@@ -21,6 +21,7 @@ let UserSchema = mongoose.Schema(
       type: Array, // Default empty a rray for room details
       default: [], // Empty array by default
     },
+    payment_history: [],
     isActive: { type: Boolean, default: true }, // To activate or deactivate user
     lastLogin: { type: Date }, // Track the user's last login
   },

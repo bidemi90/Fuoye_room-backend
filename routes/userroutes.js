@@ -67,6 +67,10 @@ const {
   payforcouplesprivatehostel,
   verifypaymentforcouplesprivatehostel,
 
+
+    // upload user profile
+    uploadProfileImage,
+
 } = require("../controllers/usercontroller");
 
 const userrouters = express.Router();
@@ -133,6 +137,7 @@ userrouters.get("/api/verifyprivatemixedpayment/:reference", verifypaymentformix
 userrouters.post("/api/payforcouplesprivatehostel", payforcouplesprivatehostel);
 userrouters.get("/api/verifyprivatecouplespayment/:reference", verifypaymentforcouplesprivatehostel);
 
-
+// Upload profile image
+userrouters.post("/uploadprofileimage", uploadProfileImage);
 
 module.exports = userrouters;
